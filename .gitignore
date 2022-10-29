@@ -1,0 +1,9 @@
+node_modules/
+build/
+.idea/
+.env
+yarn-debug.log*
+yarn-error.log*
+
+upload/
+react-project/
