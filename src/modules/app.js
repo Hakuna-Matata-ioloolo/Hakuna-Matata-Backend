@@ -3,6 +3,7 @@ const cors = require('cors');
 const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -13,27 +14,31 @@ app.request.validate = (body, validator) => {
   });
 };
 
+console.log('LLL: ' + __dirname)
+
 app.use(cors());
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-app.use(express.static(__dirname + '/../react-project/build'));
-app.use(express.static(__dirname + '/../upload'));
+app.use(express.static(__dirname + '/../../static'));
+app.use(express.static(__dirname + '/../../upload'));
 
 app.use('/api/account', require('../routes/account'));
 app.use('/api/product', require('../routes/product'));
 app.use('/api/billing', require('../routes/billing'));
 app.use('/api/order', require('../routes/order'));
-app.use('/api/tossWebhook', require('../routes/webhook'));
+app.use('/api/webhook', require('../routes/webhook'));
 
 app.all('/api/*', (req, res, next) => {
   next(new Error('잘못된 요청입니다.'));
 });
 
-app.all('*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../react-project/build/index.html'));
-});
+if (fs.existsSync(path.join(__dirname, '../../static/index.html'))) {
+  app.all('*', function (req, res) {
+    res.sendFile(path.join(__dirname, '../../static/index.html'));
+  });
+}
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
